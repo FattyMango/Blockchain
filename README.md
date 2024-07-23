@@ -1,7 +1,6 @@
 this is repository is based on https://www.youtube.com/watch?v=aE4eDTUAE70&list=PLJbE2Yu2zumC5QE39TQHBLYJDB2gfFE5Q&index=2&ab_channel=TensorProgramming
 
-In this episode we implemented a proof of work algorithm for our blockchain. 
+In this episode we added persistence to our blockchain using badgerDB.
 
-The proof of work algorithm is used to secure the blockchain by making it difficult to corrupt the blockchain, since it would require re-mining all the blocks that came after the block that was tampered with.
+badgerDB is a key-value store written in Go. It's fast and easy to use. It's a good choice for our blockchain because it's a simple key-value store and we don't need a full blown database.
 
-also it is used to validate the transactions by the nodes in the network.
