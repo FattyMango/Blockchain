@@ -3,6 +3,7 @@ package blockchain
 import (
 	"bytes"
 	"encoding/binary"
+	"os"
 )
 
 func ToHex(num int64) []byte {
@@ -12,4 +13,12 @@ func ToHex(num int64) []byte {
 		panic(err)
 	}
 	return buff.Bytes()
+}
+
+// check if the database exists by checking if the directory exists
+func DBExists() bool {
+	if _, err := os.Stat(DB_FILE); os.IsNotExist(err) {
+		return false
+	}
+	return true
 }

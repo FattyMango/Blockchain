@@ -3,12 +3,14 @@ package blockchain
 import (
 	"bytes"
 	"crypto/sha256"
+	"fmt"
 	"math"
 	"math/big"
 )
 
 var (
-	Difficulty = 20
+	// Difficulty is the number of leading bytes that must be zero in the hash
+	Difficulty = 4 * 4
 )
 
 type ProofOfWork struct {
@@ -19,7 +21,6 @@ type ProofOfWork struct {
 func NewProof(b *Block) *ProofOfWork {
 	target := big.NewInt(1)
 	target.Lsh(target, uint(256-Difficulty))
-
 	return &ProofOfWork{b, target}
 }
 
@@ -27,7 +28,7 @@ func (pow *ProofOfWork) InitData(nonce int) []byte {
 	return bytes.Join(
 		[][]byte{
 			pow.Block.PrevHash,
-			pow.Block.Data,
+			pow.Block.HashTransactions(),
 			ToHex(int64(nonce)),
 			ToHex(int64(Difficulty)),
 		},
@@ -48,6 +49,10 @@ func (pow *ProofOfWork) Run() (int, []byte) {
 		intHash.SetBytes(hash[:])
 
 		if intHash.Cmp(pow.Target) == -1 {
+			fmt.Printf("Nonce: %d\n", nonce)
+			fmt.Printf("Hash: %x\n", hash)
+			fmt.Printf("Target: %x\n", pow.Target)
+			fmt.Println()
 			break
 		}
 
