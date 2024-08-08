@@ -3,6 +3,7 @@ package blockchain
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"os"
 )
 
@@ -21,4 +22,14 @@ func DBExists() bool {
 		return false
 	}
 	return true
+}
+
+func CheckInputsExistinPreviousTransactions(inputs []TxInput, prevTXs map[string]Transaction) bool {
+	for _, in := range inputs {
+		if prevTXs[hex.EncodeToString(in.ID)].ID == nil {
+			return false
+		}
+	}
+	return true
+
 }

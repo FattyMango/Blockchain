@@ -84,6 +84,14 @@ func (ws *Wallets) LoadFile() error {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	// set the curve for all the private keys
+	// we need to this since we cannot save the curve in the json
+	for address, wallet := range wallets.Wallets {
+		wallet.PrivateKey.Curve = elliptic.P256()
+		ws.Wallets[address] = wallet
+	}
+
 	ws.Wallets = wallets.Wallets
 
 	return nil
