@@ -1,25 +1,45 @@
 package blockchain
 
+import (
+	"blockchain/internal/wallet"
+	"bytes"
+)
+
 type TxOutput struct {
-	// The amount of tokens
-	Value int
-	// Needed to unlock tokens in Value, here its the name of the user receiving the tokens
-	PubKey string
+	Value      int
+	PubKeyHash []byte
 }
 
 type TxInput struct {
-	// The ID of the transaction that contains the output
-	ID []byte
-	// The index of the output in the transaction
-	Out int
-	// The signature to unlock the output, here its the name of the user sending the tokens
-	Sig string
+	ID        []byte
+	Out       int
+	Signature []byte
+	PubKey    []byte
 }
 
-func (in *TxInput) CanUnlock(data string) bool {
-	return in.Sig == data
+// Check if the input can be unlocked with the provided address
+func (in *TxInput) UsesKey(pubKeyHash []byte) bool {
+	lockingHash := wallet.PublicKeyHash(in.PubKey)
+
+	return bytes.Compare(lockingHash, pubKeyHash) == 0
 }
 
-func (out *TxOutput) CanBeUnlocked(data string) bool {
-	return out.PubKey == data
+// set the PubKeyHash of the output to the hash of the address
+func (out *TxOutput) Lock(address []byte) {
+	pubKeyHash := wallet.Base58Decode(address)
+	// remove the version and checksum
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	out.PubKeyHash = pubKeyHash
+}
+
+// Check if the output can be unlocked with the provided address
+func (out *TxOutput) IsLockedWithKey(pubKeyHash []byte) bool {
+	return bytes.Compare(out.PubKeyHash, pubKeyHash) == 0
+}
+
+func NewTXOutput(value int, address string) *TxOutput {
+	txo := &TxOutput{value, nil}
+	txo.Lock([]byte(address))
+
+	return txo
 }

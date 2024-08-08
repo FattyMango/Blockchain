@@ -57,7 +57,7 @@ func (cli *CommandLine) createWallet() {
 func (cli *CommandLine) printChain() {
 	chain, err := blockchain.ContinueBlockChain("")
 	if err != nil {
-		panic(fmt.Sprintf("Failed to continue blockchain: %v", err))
+		log.Panic(err)
 	}
 	defer chain.DB.Close()
 	iter := chain.Iterator()
@@ -65,11 +65,13 @@ func (cli *CommandLine) printChain() {
 	for {
 		block := iter.Next()
 
-		fmt.Printf("Prev. hash: %x\n", block.PrevHash)
 		fmt.Printf("Hash: %x\n", block.Hash)
+		fmt.Printf("Prev. hash: %x\n", block.PrevHash)
 		pow := blockchain.NewProof(block)
 		fmt.Printf("PoW: %s\n", strconv.FormatBool(pow.Validate()))
-		fmt.Println("is genesis:", block.IsGenesis())
+		for _, tx := range block.Transactions {
+			fmt.Println(tx)
+		}
 		fmt.Println()
 
 		if len(block.PrevHash) == 0 {
@@ -79,23 +81,31 @@ func (cli *CommandLine) printChain() {
 }
 
 func (cli *CommandLine) createBlockChain(address string) {
+	if !wallet.ValidateAddress(address) {
+		log.Panic("Address is not Valid")
+	}
 	chain, err := blockchain.NewBlockChain(address)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to create blockchain: %v", err))
+		log.Panic(err)
 	}
 	chain.DB.Close()
 	fmt.Println("Finished!")
 }
 
 func (cli *CommandLine) getBalance(address string) {
+	if !wallet.ValidateAddress(address) {
+		log.Panic("Address is not Valid")
+	}
 	chain, err := blockchain.ContinueBlockChain(address)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to continue blockchain: %v", err))
+		log.Panic(err)
 	}
 	defer chain.DB.Close()
 
 	balance := 0
-	UTXOs := chain.FindUTXO(address)
+	pubKeyHash := wallet.Base58Decode([]byte(address))
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	UTXOs := chain.FindUTXO(pubKeyHash)
 
 	for _, out := range UTXOs {
 		balance += out.Value
@@ -105,17 +115,22 @@ func (cli *CommandLine) getBalance(address string) {
 }
 
 func (cli *CommandLine) send(from, to string, amount int) {
+	if !wallet.ValidateAddress(to) {
+		log.Panic("Address is not Valid")
+	}
+	if !wallet.ValidateAddress(from) {
+		log.Panic("Address is not Valid")
+	}
 	chain, err := blockchain.ContinueBlockChain(from)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to continue blockchain: %v", err))
+		log.Panic(err)
 	}
 	defer chain.DB.Close()
 
 	tx, err := blockchain.NewTransaction(from, to, amount, chain)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to create transaction: %v", err))
+		log.Panic(err)
 	}
-
 	chain.AddBlock([]*blockchain.Transaction{tx})
 	fmt.Println("Success!")
 }
