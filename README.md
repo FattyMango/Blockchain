@@ -6,3 +6,7 @@ In this episode we added transactions to our blockchain
 
 ## Wallets
 ![](docs/wallet.excalidraw.png)
+
+## UTXO
+Unspent Transaction Output
+![](docs/utxo.excalidraw.png)
