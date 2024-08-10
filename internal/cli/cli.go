@@ -153,7 +153,10 @@ func (cli *CommandLine) send(from, to string, amount int) {
 	if err != nil {
 		log.Panic(err)
 	}
-	block := chain.AddBlock([]*blockchain.Transaction{tx})
+
+	cbtx := blockchain.NewCoinbaseTX(from, "")
+
+	block := chain.AddBlock([]*blockchain.Transaction{cbtx, tx})
 	UTXOSet.Update(block)
 	fmt.Println("Success!")
 }

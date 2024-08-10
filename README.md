@@ -10,3 +10,6 @@ In this episode we added transactions to our blockchain
 ## UTXO
 Unspent Transaction Output
 ![](docs/utxo.excalidraw.png)
+
+## Merkle Tree
+![](docs/merkle.excalidraw.png)
