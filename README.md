@@ -13,3 +13,5 @@ Unspent Transaction Output
 
 ## Merkle Tree
 ![](docs/merkle.excalidraw.png)
+
+## Network

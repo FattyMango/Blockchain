@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"blockchain/pkg/merkle"
 	"bytes"
 	"encoding/gob"
 )
@@ -30,7 +31,7 @@ func (b *Block) HashTransactions() []byte {
 		txHashes = append(txHashes, tx.Serialize())
 	}
 
-	tree := NewMerkleTree(txHashes)
+	tree := merkle.NewMerkleTree(txHashes)
 
 	return tree.RootNode.Data
 }
