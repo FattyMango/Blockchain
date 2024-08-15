@@ -5,11 +5,12 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 )
 
-const walletFile = "./tmp/wallets.json"
+const WALLET_FILE = "./tmp/wallets_%s.json"
 
 func newKeyPair() (*ecdsa.PrivateKey, []byte) {
 	curve := elliptic.P256()
@@ -28,11 +29,11 @@ type Wallets struct {
 	Wallets map[string]*Wallet
 }
 
-func CreateWallets() (*Wallets, error) {
+func CreateWallets(nodeID string) (*Wallets, error) {
 	wallets := Wallets{}
 	wallets.Wallets = make(map[string]*Wallet)
 
-	err := wallets.LoadFile()
+	err := wallets.LoadFile(nodeID)
 
 	return &wallets, err
 }
@@ -57,17 +58,19 @@ func (ws *Wallets) GetAllAddresses() []string {
 }
 
 func (ws Wallets) GetWallet(address string) Wallet {
+
+	fmt.Printf("Getting : %+v\n", ws.Wallets)
 	return *ws.Wallets[address]
 }
 
-func (ws *Wallets) LoadFile() error {
-	if _, err := os.Stat(walletFile); os.IsNotExist(err) {
+func (ws *Wallets) LoadFile(nodeID string) error {
+	if _, err := os.Stat(FormatWalletFile(nodeID)); os.IsNotExist(err) {
 		// Create a new wallet file
-		os.WriteFile(walletFile, []byte{}, 0644)
+		os.WriteFile(FormatWalletFile(nodeID), []byte{}, 0644)
 		return nil
 	}
 
-	fileContent, err := os.ReadFile(walletFile)
+	fileContent, err := os.ReadFile(FormatWalletFile(nodeID))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -97,14 +100,20 @@ func (ws *Wallets) LoadFile() error {
 	return nil
 }
 
-func (ws *Wallets) SaveFile() {
+func (ws *Wallets) SaveFile(nodeID string) {
 
 	wsJson, err := ws.MarshalJSON()
 	if err != nil {
 		log.Panic(err)
 	}
 
-	err = os.WriteFile(walletFile, wsJson, 0644)
+	// check if file exists, if not create it
+	if _, err := os.Stat(FormatWalletFile(nodeID)); os.IsNotExist(err) {
+		// Create a new wallet file
+		os.WriteFile(FormatWalletFile(nodeID), []byte{}, 0644)
+	}
+
+	err = os.WriteFile(FormatWalletFile(nodeID), wsJson, 0644)
 	if err != nil {
 		log.Panic(err)
 	}

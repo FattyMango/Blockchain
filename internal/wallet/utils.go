@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/mr-tron/base58"
@@ -21,4 +22,8 @@ func Base58Decode(input []byte) []byte {
 	}
 
 	return decode
+}
+
+func FormatWalletFile(nodeID string) string {
+	return fmt.Sprintf(WALLET_FILE, nodeID)
 }

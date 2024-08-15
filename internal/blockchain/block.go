@@ -4,17 +4,20 @@ import (
 	"blockchain/pkg/merkle"
 	"bytes"
 	"encoding/gob"
+	"time"
 )
 
 type Block struct {
+	Timestamp    int64
 	Hash         []byte
 	Transactions []*Transaction
 	PrevHash     []byte
 	Nonce        int
+	Height       int
 }
 
-func CreateBlock(transactions []*Transaction, prevHash []byte) *Block {
-	block := &Block{[]byte{}, transactions, prevHash, 0}
+func CreateBlock(transactions []*Transaction, prevHash []byte, height int) *Block {
+	block := &Block{time.Now().Unix(), []byte{}, transactions, prevHash, 0, height}
 	pow := NewProof(block)
 	block.Nonce, block.Hash = pow.Run()
 
@@ -22,13 +25,17 @@ func CreateBlock(transactions []*Transaction, prevHash []byte) *Block {
 }
 
 func Genesis(coinbase *Transaction) *Block {
-	return CreateBlock([]*Transaction{coinbase}, []byte{})
+	return CreateBlock([]*Transaction{coinbase}, []byte{}, 0)
 }
 func (b *Block) HashTransactions() []byte {
 	var txHashes [][]byte
 
 	for _, tx := range b.Transactions {
-		txHashes = append(txHashes, tx.Serialize())
+		ser, err := tx.Serialize()
+		if err != nil {
+			panic(err)
+		}
+		txHashes = append(txHashes, ser)
 	}
 
 	tree := merkle.NewMerkleTree(txHashes)

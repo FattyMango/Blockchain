@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"os"
 )
 
@@ -17,8 +18,9 @@ func ToHex(num int64) []byte {
 }
 
 // check if the database exists by checking if the directory exists
-func DBExists() bool {
-	if _, err := os.Stat(DB_FILE); os.IsNotExist(err) {
+func DBExists(path string) bool {
+	fmt.Println("Checking if database exists for" + path)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
 	return true
@@ -32,4 +34,12 @@ func CheckInputsExistinPreviousTransactions(inputs []TxInput, prevTXs map[string
 	}
 	return true
 
+}
+
+func FormatDBPath(nodeID string) string {
+	return fmt.Sprintf(DB_PATH, nodeID)
+}
+
+func FormatDBFilePath(nodeID string) string {
+	return FormatDBPath(nodeID) + "/MANIFEST"
 }
