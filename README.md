@@ -2,7 +2,7 @@
 
 Full implementation of a blockchain in Golang with a full network of nodes and persistent storage.
 
-this is project is based on [Tensor Programming's](https://www.youtube.com/watch?v=aE4eDTUAE70&list=PLJbE2Yu2zumC5QE39TQHBLYJDB2gfFE5Q&index=2&ab_channel=TensorProgramming) tutorial.
+
 
 
 ## Design
@@ -51,3 +51,7 @@ Unspent Transaction Output
 ## Merkle Tree
 ![](docs/merkle.excalidraw.png)
 
+
+
+## References
+- [Tensor Programming's](https://www.youtube.com/watch?v=aE4eDTUAE70&list=PLJbE2Yu2zumC5QE39TQHBLYJDB2gfFE5Q&index=2&ab_channel=TensorProgramming) 
